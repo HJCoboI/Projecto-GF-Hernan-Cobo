@@ -1,0 +1,218 @@
+---
+title: "Proyecto gestion financiera"
+author: "Hernan Cobo"
+format: html
+editor: visual
+lang: es - CL
+---
+
+```{python}
+# Librerias a usar en el hito
+
+#Instalar librerias
+!pip install matplotlib
+!pip install numpy
+!pip install yfinance
+!pip install scipy
+
+#Importar librerias
+import matplotlib.pyplot as plt
+import numpy as np
+import yfinance as yf
+from scipy.stats import norm
+```
+
+# Hito 1
+
+## Sector
+
+En el presente informe se realizará un análisis de una opción financiera sobre acciones de una de las empresas lideres en el comercio de combustibles fósiles a nivel mundial, ExxonMobil. El sector de la industria de los combustibles fósiles es una de las industrias más antiguas y con mayor crecimiento histórico en la economía global. Este sector comprende las áreas del petróleo, el carbón y el gas natural que son los tres principales combustibles fósiles que se usan hoy en día.
+
+ExxonMobil es una de las mayores y más influyentes compañías energéticas del mundo, con una historia que se remonta al siglo XIX. La empresa tal como la conocemos hoy es el resultado de la fusión entre Exxon y Mobil en 1999, pero sus raíces se encuentran en la famosa Standard Oil Company, fundada por John D. Rockefeller en 1870.
+
+El sector del petróleo es muy importante para la economía global, ya que provee en gran medida la energía que se usa diferentes actividades como el transporte, la industria y la generación eléctrica en general. Este recurso no solo impulsa a grandes industrias, sino que también es clave en la producción de productos derivados como plásticos, químicos y fertilizantes, que son esenciales para el desarrollo de múltiples sectores. Por lo mismo, la demanda global de petróleo en el mercado global es muy alta, según el informe anual de Aramco la demanda global de petróleo en el año 2023 fue de 102.3 millones de barriles diarios (Aramco, 2023).
+
+## Motivación
+
+En un mundo en el que una de las mayores preocupaciones es el cuidado medioambiental, el problema de la generación y abastecimiento energético de manera sostenible y renovable tanto para el uso cotidiano como en el transporte y en la industria, es un desafío que se plantean organizaciones internacionales como la ONU.
+
+Por lo tanto, existe una motivación de hacer el análisis de cómo se comporta en el mercado financiero una empresa que es pionera en el comercio del petróleo. En el sentido de cómo se enfrenta a las apariciones de nuevos tipos de energías y como afecta a su estabilidad dentro del mercado las diferentes medidas que se está tomando la empresa para una mejor relación medioambiental. Estudios estiman que las estrategias de ExxonMobil no son las adecuadas y que el panorama de la corporación petrolera no es alentador haciendo proyecciones hacia el año 2050 (Krizsa, 2021).
+
+Pero según un análisis actual ExxonMobil se destaca como una de las mejores acciones asequibles para comprar actualmente, gracias a su sólido desempeño financiero. A pesar de la incertidumbre económica, con posibles recortes en las tasas de interés y un aumento en la probabilidad de recesiones, Exxon ha logrado resultados significativos, incluyendo un aumento en sus ganancias y producción. La compañía superó las expectativas de ganancias para el segundo trimestre de 2024, reportando un EPS de \$2.14, y alcanzó un récord en producción en Guyana y el Permian Basin, con una producción de 1.2 millones de barriles por día. Además, Exxon ha mantenido un crecimiento constante de dividendos durante más de 40 años, con un rendimiento promedio del 2.20% en los últimos cinco años.
+
+## Contexto
+
+Para este análisis se pueden considerar tres variables que tienen una relación bastante directa con lo que pueden ser las acciones de la empresa petrolera ExxonMobil y su comportamiento en cuanto a rendimiento, seguridad y confianza en el mercado financiero. La primera de ellas es la variable del precio del petróleo crudo Brent.
+
+El precio del petróleo crudo Brent es una de las principales referencias globales para el precio del petróleo en el mercado global de este producto. Su comportamiento a lo largo del tiempo puede mostrar un cierto nivel de volatilidad debido a ciertos factores entre los que pueden ser geopolíticos, cambios en la oferta y la demanda global, y eventos como conflictos entre países o decisiones que toman organismos como la OPEP que es la organización de países exportadores de petróleo (Gao, 2023).
+
+```{python}
+# Descargar datos históricos del precio del petróleo crudo Brent
+data = yf.download("BZ=F", start="2023-01-01", end="2024-8-30")
+
+# Crear el gráfico de líneas
+plt.figure(figsize=(14, 7))
+plt.plot(data["Close"], label="Brent Crude Oil")
+plt.xlabel("Fecha")
+plt.ylabel("Precio")
+plt.title("Precio del Petróleo Crudo Brent")
+plt.legend()
+plt.xticks(rotation=25)
+plt.grid(True)
+plt.show()
+```
+
+El gráfico anterior muestra el precio del del petróleo crudo Brent en un intervalo de tiempo desde inicios de 2023 hasta septiembre de 2024. A partir del grafico se puede notar el nivel de volatilidad al mostrar picos significativos tanto altos como bajos en un periodo de tiempo de tan solo un año y medio aproximadamente.
+
+La siguiente variable para considerar y que también se relaciona directamente con la temática de análisis es la producción de petróleo crudo a nivel global. La producción mundial de petróleo crudo, medida en millones de barriles por día (bpd), ha mostrado un crecimiento sostenido durante las últimas décadas, aunque con caídas durante crisis económicas globales o por decisiones de reducción de la oferta de grandes productores como la OPEP. Estadísticamente, su crecimiento ha sido relativamente estable, con desviaciones estándar que reflejan eventos geopolíticos o cambios en políticas energéticas.
+
+La producción de petróleo tiene un impacto directo en el equilibrio entre oferta y demanda en el mercado global, lo que afecta los precios. Un aumento en la producción tiende a reducir los precios del crudo, mientras que una reducción, especialmente en tiempos de alta demanda, puede generar incrementos en los precios.
+
+La última variable que se analizara y también está estrechamente relacionada con el tema del estudio es la volatilidad de las acciones de la corporación Americana ExxonMobil. Este aspecto es sumamente importante a la hora de hacer un análisis de derivados sobre esta acción. Esto es porque si la volatilidad de la acción es muy alta, el riesgo de apostar con una opción del tipo put o call es más alta y por ende su precio es más alto.
+
+La siguiente imagen muestra la volatilidad de las acciones de ExxonMobil desde 2019.
+
+```{python}
+data = yf.download("XOM", start="2019-01-01", end="2023-12-31")
+
+# Calcular los rendimientos logarítmicos diarios
+daily_returns = np.log(data["Close"] / data["Close"].shift(1))
+
+# Calcular la volatilidad móvil (desviación estándar móvil)
+volatility = daily_returns.rolling(window=20).std() * np.sqrt(252)
+
+# Crear el gráfico de la volatilidad
+plt.figure(figsize=(12, 6))
+plt.plot(volatility, label="Volatilidad")
+plt.xlabel("Fecha")
+plt.ylabel("Volatilidad")
+plt.title("Volatilidad de las Acciones de ExxonMobil desde 2019")
+plt.legend()
+plt.grid(True)
+plt.show()
+```
+
+## Derivados
+
+Luego de los análisis anteriores, corresponde proceder al análisis sobre algún derivado del tipo call sobre acciones de la corporación petrolera americana ExxonMobil. El derivado de tipo call es un contrato que le entrega la opción, no obligación, de poder comprar el activo subyacente (en este caso la acción de ExxonMovil) a un precio preestablecido en el contrato (strike). Por lo tanto, si el precio de acción es superior al precio de strike, el tenedor del derivado call se verá beneficiado al ejercer su opción de compra.
+
+Lo que se hará a continuación es hacer un análisis de valoración de opciones aplicando dos modelos de valoración, el modelo binomial y el modelo Black-Scholes, y de esta manera poder comparar ambos resultados y obtener una mejor aproximación sobre la valorización de la opción.
+
+![](images/clipboard-2825134695.png)
+
+La imagen muestra el derivado que se analizara. Esta imagen fue obtenida directamente de la página de Yahoo finance.
+
+### Modelo binomial
+
+```{python}
+# Descargar datos de cierre de ExxonMobil
+exxon = yf.Ticker("XOM")
+hist = exxon.history(period="2y")  # Puedes ajustar el periodo según tus necesidades
+
+# Extraer los precios de cierre
+close_prices = hist['Close'].tolist()
+
+def binomial_model(cu, p, cd, rf):
+    return (cu * p + cd * (1 - p)) / (1 + rf)
+
+# Usar los precios de cierre de ExxonMobil
+S = close_prices[-1]  # Precio actual del activo subyacente
+K = 65  # Precio de ejercicio de la opción
+T = 1  # Tiempo hasta la expiración (en años)(aprox)
+r = 0.03738  # Tasa de interés libre de riesgo
+u = 1.1  # Factor de crecimiento en un paso hacia arriba
+d = 0.9  # Factor de crecimiento en un paso hacia abajo
+
+Su = S * u
+Sd = S * d
+p = (1 + r - d) / ((1 + r) * (u - d))
+
+cu = max(Su - K, 0)
+cd = max(Sd - K, 0)
+
+print(f"El precio de la opción con el Modelo Binomial es {binomial_model(cu, p, cd, r)}")
+```
+
+Dado que la opción call sobre activos de ExxonMobil tiene un vencimiento aproximado de un año y una tasa libre de riesgo del 3.738%, podemos interpretar la valoración de la siguiente manera:
+
+-   Precio de ejercicio (strike price): \$65.
+
+-   Precio actual de la acción de ExxonMobil: \$115.27 (al 20 de septiembre de 2024) (Yahoo Finanzas).
+
+-   Precio de la opción call según el modelo binomial: \$53.93.
+
+El precio de la opción call es inferior al precio de ejercicio, lo que significa que, según el modelo binomial, la opción está *out of the money*. Esto podría indicar que, dadas las condiciones actuales del mercado y la tasa libre de riesgo, es menos probable que la opción alcance o supere el precio de ejercicio en el tiempo restante hasta su vencimiento.
+
+### Modelo Black-Scholes
+
+Luego de realizar el modelo de valoración de opciones binomial, lo que hay que hacer a continuación es realizar la valorización, pero aplicando el modelo de Black-Scholes.  Este procedimiento se realizará a continuación.
+
+```{python}
+def black_scholes(S, K, t, r, sigma):
+    d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * t) / (sigma * np.sqrt(t))
+    d2 = d1 - sigma * np.sqrt(t)
+    N_d1 = norm.cdf(d1)
+    N_d2 = norm.cdf(d2)
+    precio_call = S * N_d1 - K * np.exp(-r * t) * N_d2
+    return precio_call
+
+# Descargar datos de cierre de ExxonMobil
+exxon = yf.Ticker("XOM")
+hist = exxon.history(period="2y")  # Puedes ajustar el periodo según tus necesidades
+
+# Extraer los precios de cierre
+close_prices = hist['Close'].tolist()
+
+# Calcular los rendimientos logarítmicos
+rendimientos = np.diff(np.log(close_prices))
+
+# Calcular sigma (desviación estándar de los rendimientos)
+sigma = np.std(rendimientos[1:])
+
+# Calcular volatilidad (varianza de los rendimientos)
+volatilidad = np.var(rendimientos[1:])
+
+# Parámetros de la opción
+S = close_prices[-1]  # Precio actual del activo subyacente
+K = 65  # Precio de ejercicio de la opción
+R = 0.03738  # Tasa de interés libre de riesgo
+t = 1  # Tiempo hasta la expiración (en años)(aprox)
+
+print(f"El precio de la opción con el Modelo Black and Scholes es {black_scholes(S, K, t, R, sigma)}")
+```
+
+Al comparar los resultados obtenidos para la opción call sobre activos de ExxonMobil utilizando los modelos de Black-Scholes y binomial, puedes observar que ambos modelos dan precios similares:
+
+-   Modelo binomial: \$53.93.
+
+-   Modelo Black-Scholes: \$54.56.
+
+-   Precio de ejercicio (strike): \$65.
+
+-   Vencimiento aproximado: 1 año.
+
+-   Tasa libre de riesgo: 3.738%
+
+Además, se pueden hacer ciertas interpretaciones respecto del los resultados obtenidos en ambos modelos.
+
+Los precios de la opción calculados por ambos modelos son bastante cercanos, lo que es común cuando los modelos se aplican correctamente. Esto sugiere que ambos métodos consideran las mismas variables de manera coherente.
+
+Opción fuera del dinero: El precio de ejercicio de la opción es \$65, lo que es mayor que el valor calculado de la opción (\$53.93 o \$54.56). Esto significa que la opción está *out of the money* en este momento, ya que el precio de la acción subyacente tendría que aumentar significativamente para que la opción tenga valor intrínseco.
+
+Para profundizar en el análisis, también se podrían hacer ciertas diferenciaciones respecto de los modelos utilizados, entre ellas. El modelo binomial es más flexible y puede adaptarse mejor a escenarios en los que se espera que el precio de la acción subyacente siga una trayectoria particular. Por otro lado, el modelo Black-Scholes supone un movimiento continuo del precio de la acción y es más adecuado para mercados que siguen un comportamiento estable con volatilidad constante.
+
+Ambos precios reflejan una probabilidad relativamente baja de que la opción llegue a estar *in the money* antes del vencimiento, dado que el precio de ejercicio es más alto que el valor estimado de la opción.
+
+## Conclusiónes
+
+El último cierre de la opción call del análisis sobre ExxonMobil es de \$50.31 según los datos recopilados en Yahoo finance, este dato es inferior a los valores obtenidos tanto por el modelo binomial como por el modelo Black-Scholes, que fueron \$53.93 y \$54.56 respectivamente. Esto puede decirnos que el mercado está valorando la opción de forma más conservadora, probablemente debido a expectativas de menor volatilidad o de que el precio de la acción no alcanzará el strike de \$65 dentro del plazo de un año. Los modelos teóricos suponen condiciones ideales que podrían no considerar ciertos factores del mercado real, como cambios macroeconómicos o eventos específicos de la empresa.
+
+A pesar de que los modelos indican un precio más alto, el hecho de que la opción esté *out of the money* y el precio de mercado sea inferior sugiere que los inversores son más cautelosos sobre las perspectivas de ExxonMobil en el corto plazo. Esta diferencia en valoraciones puede reflejar la percepción del mercado de un riesgo mayor o menores expectativas de crecimiento, lo que lleva a una menor demanda de la opción y, en consecuencia, a un precio más bajo.
+
+## Referencias
+
+-   Aramco (2023) *Annual Report 2023*. Available at: www.aramco.com/en/investors/annual-report
+
+-   Krizsa. F (2021). An Oil Giant in a Changing Energy Sector
+
+-   Gao. X (2023). The relative pricing of WTI and Brent crude oil futures: Expectations or risk premia?, *Journal of Commodity Markets*, Volume 30
